@@ -1,52 +1,21 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import * as THREE from 'three';
 import './style.css';
 import './scene.css';
+import ChipScene from './components/ChipScene';
+import Header from './components/Header';
+import Home from './components/Home';
+import Projects from './components/Projects';
+import Skills from './components/Skills';
+import Contact from './components/Contact';
 
-const projects = [
-  { name: 'COMPRESSO', type: 'Python application', description: 'A file compression application built using Python with a Streamlit interface.', tech: ['Python', 'Streamlit', 'zlib', 'LZMA'], features: ['File compression', 'Multithreaded compression'] },
-  { name: 'μSHAKTHIOS', type: 'Embedded systems', description: 'A lightweight embedded RTOS project for ESP32 with a graphical interface.', tech: ['ESP32', 'FreeRTOS', 'LVGL', 'SPIFFS'], features: [] },
-  { name: 'MONAD CANVAS', type: 'Hackathon team project', description: 'An on-chain, 64×64 collaborative pixel canvas built on Monad Testnet with a Gemini-backed semantic engine.', tech: ['JavaScript', 'Monad Testnet', 'Gemini API'], features: ['Team: Ronav JS Gop, Sayandeep Dutta', 'My role: TODO — add your contribution'], github: 'https://github.com/jishnu-vn/monad-canvas', original: 'https://github.com/redhatsam09/monad-canvas' },
-];
-const skillGroups = [
-  ['Programming', 'Python (strongest language)', 'C++ — DSA, STL, OOP fundamentals', 'C — pointers, structures, dynamic memory', 'Java — basic familiarity'],
-  ['Problem Solving', 'Data Structures', 'Algorithms', 'Basic DSA', 'LeetCode problem solving'],
-  ['Web & Database', 'HTML, CSS, JavaScript', 'React, Node.js, Flask, Streamlit', 'MySQL, SQL, DBMS fundamentals'],
-  ['Embedded & Tools', 'ESP32, FreeRTOS, LVGL, SPIFFS', 'Git, GitHub, VS Code'],
-];
-
-function ChipScene() {
+function App() {
+  const [view, setView] = useState('home');
   useEffect(() => {
-    const canvas = document.querySelector('.chip-canvas');
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 100);
-    camera.position.set(0, 3.2, 11);
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-    renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
-    scene.add(new THREE.AmbientLight(0xffffff, 1));
-    const light = new THREE.DirectionalLight(0x7dd3fc, 2); light.position.set(4, 6, 5); scene.add(light);
-    const chip = new THREE.Group(); chip.position.set(3.5, .3, 0); chip.rotation.set(.45, -.45, .08); scene.add(chip);
-    const add = (geometry, material, y = 0) => { const mesh = new THREE.Mesh(geometry, material); mesh.position.y = y; chip.add(mesh); return mesh; };
-    add(new THREE.BoxGeometry(5.5, .2, 3.6), new THREE.MeshStandardMaterial({ color: 0x0b1020, metalness: .65, roughness: .35 }));
-    add(new THREE.BoxGeometry(3.5, .28, 2.4), new THREE.MeshStandardMaterial({ color: 0x1a2539, metalness: .9, roughness: .2 }), .24);
-    [-.8, .8].forEach(x => { const die = add(new THREE.BoxGeometry(.78, .1, .78), new THREE.MeshStandardMaterial({ color: 0x38bdf8, emissive: 0x063350, metalness: .9 }), .45); die.position.x = x; });
-    let frame; const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const draw = time => { if (!reduced) chip.rotation.y = -.45 + Math.sin(time * .0003) * .12; camera.lookAt(chip.position); renderer.render(scene, camera); frame = requestAnimationFrame(draw); };
-    const resize = () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); };
-    addEventListener('resize', resize); draw(0);
-    return () => { cancelAnimationFrame(frame); removeEventListener('resize', resize); renderer.dispose(); };
-  }, []);
-  return <canvas className="chip-canvas" aria-hidden="true" />;
+    document.title = `${view === 'home' ? 'Jishnu VN' : view[0].toUpperCase() + view.slice(1)} | Portfolio`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [view]);
+  return <><ChipScene /><Header view={view} setView={setView} /><main>{view === 'home' && <Home setView={setView} />}{view === 'projects' && <Projects />}{view === 'skills' && <Skills />}{view === 'contact' && <Contact />}</main><footer>© 2026 Jishnu VN · Built with ReactJS</footer></>;
 }
 
-function Header({ view, setView }) {
-  const links = [['home', 'About'], ['projects', 'Projects'], ['skills', 'Skills'], ['contact', 'Contact']];
-  return <header><a className="brand" onClick={() => setView('home')} href="#home"><img src="/jishnu.jpg" alt="Jishnu VN" />Jishnu VN <small>SRMIST · CSE</small></a><nav>{links.map(([key, label]) => <button className={view === key ? 'active' : ''} onClick={() => setView(key)} key={key}>{label}</button>)}</nav><a className="contact-top" href="mailto:jishnuravi66@gmail.com">Get in touch</a></header>;
-}
-function Home({ setView }) { return <><section className="hero" id="home"><div><p className="eyebrow">AVAILABLE FOR INTERNSHIPS & PLACEMENTS · 2026</p><h1>Building practical software from <span>clean code</span> to <span>embedded systems</span>.</h1><p className="lead">I’m <strong>Jishnu VN</strong>, a third-year B.Tech Computer Science Engineering student at SRM Institute of Science and Technology, preparing for software engineering roles.</p><div className="actions"><button className="primary" onClick={() => setView('projects')}>View projects →</button><button className="secondary" onClick={() => setView('contact')}>Contact me</button></div><div className="metrics"><span><b>2024–2028</b>B.Tech CSE</span><span><b>100+</b>LeetCode problems</span><span><b>Python</b>Strongest language</span></div></div><aside className="profile"><img src="/jishnu.jpg" alt="Jishnu VN" /><div><h2>Jishnu VN</h2><p>Computer Science Student<br />Aspiring Software Engineer</p><hr /><p><b>Focus</b><br />Software Engineering · Web Development · DSA</p><p><b>Location</b><br />Kozhikode, Kerala, India</p></div></aside></section><section className="content-section"><p className="eyebrow">01 / ABOUT</p><h2>Learning software engineering through projects and problem solving.</h2><p className="body-copy">I’m a third-year B.Tech Computer Science Engineering student at SRM Institute of Science and Technology, preparing for software engineering roles. Python is my strongest programming language, followed by C++, C, and Java. I have a growing foundation in Data Structures and Algorithms, Object-Oriented Programming, MySQL, and web development. I enjoy building practical projects and experimenting with new technologies through projects and hackathons.</p><p className="body-copy">I’m currently focused on strengthening my problem-solving and software development skills and preparing for software engineering internships and placements.</p></section></> }
-function Projects() { const [query, setQuery] = useState(''); const [filter, setFilter] = useState('All'); const types = ['All', ...new Set(projects.map(p => p.type))]; const shown = useMemo(() => projects.filter(p => (filter === 'All' || p.type === filter) && `${p.name} ${p.description} ${p.tech.join(' ')}`.toLowerCase().includes(query.toLowerCase())), [query, filter]); return <section className="content-section" id="projects"><p className="eyebrow">02 / PROJECTS</p><h2>Projects I’ve built and contributed to.</h2><div className="project-tools"><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search technologies or projects" aria-label="Search projects" /><select value={filter} onChange={e => setFilter(e.target.value)} aria-label="Filter projects">{types.map(type => <option key={type}>{type}</option>)}</select></div><div className="project-grid">{shown.map(project => <article className="project-card" key={project.name}><p className="project-type">{project.type}</p><h3>{project.name}</h3><p>{project.description}</p><div className="tags">{project.tech.map(t => <span key={t}>{t}</span>)}</div>{project.features.length > 0 && <ul>{project.features.map(f => <li key={f}>{f}</li>)}</ul>}{project.github && <p className="links"><a href={project.github} target="_blank" rel="noreferrer">GitHub ↗</a><a href={project.original} target="_blank" rel="noreferrer">Original repo ↗</a></p>}</article>)}</div>{shown.length === 0 && <p className="empty">No projects match that search.</p>}</section>; }
-function Skills() { return <section className="content-section" id="skills"><p className="eyebrow">03 / TECHNICAL STACK</p><h2>A growing foundation across software and systems.</h2><div className="skills-grid">{skillGroups.map(([title, ...skills]) => <article className="skill-card" key={title}><h3>{title}</h3><ul>{skills.map(skill => <li key={skill}>{skill}</li>)}</ul></article>)}</div><div className="achievement"><div><p className="eyebrow">PROBLEM SOLVING</p><h3>100+ Problems Solved</h3><p>Arrays · Strings · Hash Tables · Math · Dynamic Programming</p></div><b>50 Days<br /><small>Badge 2026</small></b></div><div className="two-column"><article><p className="eyebrow">CERTIFICATIONS</p><ul className="plain-list"><li>Getting Started with Artificial Intelligence — IBM SkillsBuild, March 2026</li><li>Data Analytics with Python — NPTEL, May 2025</li><li>Crash Course on Python — Google / Coursera, May 2025</li><li>Soft Skills Development (Elite + Silver) — NPTEL, April 2025</li></ul></article><article><p className="eyebrow">LANGUAGES</p><p className="languages">English · Malayalam · Tamil · Hindi</p></article></div></section> }
-function Contact() { const [form, setForm] = useState({ name: '', email: '', message: '' }); const [errors, setErrors] = useState({}); const [validated, setValidated] = useState(false); const update = e => { setValidated(false); setForm({ ...form, [e.target.name]: e.target.value }); }; const submit = e => { e.preventDefault(); const next = {}; if (!form.name.trim()) next.name = 'Please enter your name.'; if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = 'Enter a valid email address.'; if (form.message.trim().length < 10) next.message = 'Please add at least 10 characters.'; setErrors(next); setValidated(!Object.keys(next).length); }; return <section className="content-section" id="contact"><p className="eyebrow">04 / CONTACT</p><h2>Let’s connect.</h2><p className="body-copy">I’m open to software engineering internships, placement opportunities, and project conversations.</p><div className="contact-grid"><article><h3>Direct contact</h3><a href="mailto:jishnuravi66@gmail.com">jishnuravi66@gmail.com</a><a href="tel:+919789238990">+91 9789238990</a><p>Kozhikode, Kerala, India</p><div className="socials"><a href="https://github.com/jishnu-vn" target="_blank" rel="noreferrer">GitHub ↗</a><a href="https://www.linkedin.com/in/jishnu-vn-776004305" target="_blank" rel="noreferrer">LinkedIn ↗</a><span title="Add existing LeetCode URL when available">LeetCode — TODO</span></div></article><form onSubmit={submit} noValidate><h3>Contact-form validation</h3><p className="form-note">This demo validates input in the browser. No data is sent or stored.</p><label>Name<input name="name" value={form.name} onChange={update} aria-invalid={!!errors.name} /></label>{errors.name && <small className="error">{errors.name}</small>}<label>Email<input name="email" type="email" value={form.email} onChange={update} aria-invalid={!!errors.email} /></label>{errors.email && <small className="error">{errors.email}</small>}<label>Message<textarea name="message" rows="5" value={form.message} onChange={update} aria-invalid={!!errors.message} /></label>{errors.message && <small className="error">{errors.message}</small>}<button className="primary" type="submit">Validate form</button>{validated && <p className="success" role="status">Form validation successful. This client-side demo does not send or store your details.</p>}</form></div></section>; }
-function App() { const [view, setView] = useState('home'); useEffect(() => { document.title = `${view === 'home' ? 'Jishnu VN' : view[0].toUpperCase() + view.slice(1)} | Portfolio`; window.scrollTo({ top: 0, behavior: 'smooth' }); }, [view]); return <><ChipScene /><Header view={view} setView={setView} /><main>{view === 'home' && <Home setView={setView} />}{view === 'projects' && <Projects />}{view === 'skills' && <Skills />}{view === 'contact' && <Contact />}</main><footer>© 2026 Jishnu VN · Built with ReactJS</footer></>; }
 createRoot(document.getElementById('root')).render(<App />);
